@@ -1,0 +1,38 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+}
+
+model Books {
+    id    Int    @id @default(autoincrement())
+    title String @db.Text
+
+    authorId Int
+    authors  Authors       @relation(fields: [authorId], references: [id])
+    genres   Book_Genres[]
+}
+
+model Authors {
+    id    Int     @id @default(autoincrement())
+    name  String  @db.Text
+    books Books[]
+}
+
+model Genres {
+    id         Int           @id @default(autoincrement())
+    name       String        @db.Text
+    bookGenres Book_Genres[]
+}
+
+model Book_Genres {
+    bookId Int
+    books  Books @relation(fields: [bookId], references: [id])
+
+    genreId Int
+    genres  Genres @relation(fields: [genreId], references: [id])
+
+    @@unique([bookId, genreId])
+}
