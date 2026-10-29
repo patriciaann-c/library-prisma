@@ -13,6 +13,7 @@ model Books {
     authorId Int
     authors  Authors       @relation(fields: [authorId], references: [id])
     genres   Book_Genres[]
+    loans    Loans[]
 }
 
 model Authors {
@@ -49,10 +50,17 @@ model Loans {
     due_date    DateTime
     return_date DateTime?
     status      Loans_Status @default(ACTIVE)
+
+    booksId Int
+    books   Books @relation(fields: [booksId], references: [id])
+
+    membersId Int
+    members   Members @relation(fields: [membersId], references: [id])
 }
 
 model Members {
-    id    Int    @id @default(autoincrement())
+    id    Int     @id @default(autoincrement())
     name  String
-    email String @unique
+    email String  @unique
+    loans Loans[]
 }
