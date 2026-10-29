@@ -50,3 +50,9 @@ model Loans {
     return_date DateTime?
     status      Loans_Status @default(ACTIVE)
 }
+
+model Members {
+    id    Int    @id @default(autoincrement())
+    name  String
+    email String @unique
+}
