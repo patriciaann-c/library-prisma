@@ -36,3 +36,17 @@ model Book_Genres {
 
     @@unique([bookId, genreId])
 }
+
+enum Loans_Status {
+    ACTIVE
+    RETURNED
+    OVERDUE
+}
+
+model Loans {
+    id          Int          @id @default(autoincrement())
+    start_date  DateTime
+    due_date    DateTime
+    return_date DateTime?
+    status      Loans_Status @default(ACTIVE)
+}
