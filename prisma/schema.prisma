@@ -7,8 +7,10 @@ datasource db {
 }
 
 model Books {
-    id    Int    @id @default(autoincrement())
-    title String @db.Text
+    id               Int      @id @default(autoincrement())
+    title            String   @db.Text
+    publication_date DateTime @db.Date
+    price            Decimal  @db.Decimal(10, 2)
 
     authorId Int
     authors  Authors       @relation(fields: [authorId], references: [id])

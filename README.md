@@ -26,6 +26,7 @@ This project showcases modern Prisma 7 conventions—including the TypeScript co
   - [Environment Setup](#environment-setup)
   - [Database Migrations](#database-migrations)
 - [Available Scripts](#-available-scripts)
+- [Database Testing (`test-db.js`)](#-database-testing-test-dbjs)
 - [Usage Example](#-usage-example)
 - [Prisma 7 Highlights](#-prisma-7-highlights)
 - [Contributing & License](#-contributing--license)
@@ -63,6 +64,8 @@ erDiagram
     Books {
         Int id PK
         String title
+        DateTime publication_date
+        Decimal price
         Int authorId FK
     }
 
@@ -98,7 +101,7 @@ erDiagram
 | Model | Description | Key Fields & Relations |
 | :--- | :--- | :--- |
 | **`Authors`** | Stores authors who write books. | `id`, `name`, `books[]` (1-to-many with `Books`) |
-| **`Books`** | Catalog of library books. | `id`, `title`, `authorId`, `genres[]`, `loans[]` |
+| **`Books`** | Catalog of library books. | `id`, `title`, `publication_date`, `price`, `authorId`, `genres[]`, `loans[]` |
 | **`Genres`** | Categories (e.g., Fiction, Sci-Fi, History). | `id`, `name`, `bookGenres[]` |
 | **`Book_Genres`** | Explicit pivot table connecting books and genres. | `bookId`, `genreId` (with `@@unique([bookId, genreId])`) |
 | **`Members`** | Registered library patrons. | `id`, `name`, `email` (unique), `loans[]` |
@@ -136,6 +139,7 @@ library-prisma/
 ├── pnpm-lock.yaml              # Lockfile
 ├── prisma-client.js            # Initialized PrismaClient with MariaDB adapter
 ├── prisma.config.ts            # Prisma 7 CLI configuration (datasources & shadow DB)
+├── test-db.js                  # Test script for manual data insertion & verification
 └── README.md                   # Project documentation
 ```
 
@@ -214,6 +218,47 @@ pnpm generate
 | `pnpm migrate` | `prisma migrate dev` | Applies pending migrations and updates Prisma Client in development. |
 | `pnpm generate` | `prisma generate` | Generates the strongly-typed Prisma Client. |
 | `pnpm studio` | `prisma studio` | Opens the visual database browser at `http://localhost:5555`. |
+
+---
+
+## 🧪 Database Testing (`test-db.js`)
+
+A dedicated test script (`test-db.js`) is included to verify database connectivity and test relational data insertion manually.
+
+The script demonstrates Prisma's **nested writes** (`create` with relation) and top-level `await` support in native ES Modules:
+
+```javascript
+import { client } from "./prisma-client.js";
+
+const newBook = await client.books.create({
+    data: {
+        title: "Rich dad poor dad",
+        publication_date: new Date('2000-04-01'),
+        price: 14.99,
+
+        // Automatically creates and links the associated author record
+        authors: {
+            create: {
+                name: "Robert Kiyosaki"
+            }
+        }
+    }
+});
+
+// Closes the connection pool opened by the adapter
+await client.$disconnect();
+```
+
+### Running the Test Script
+
+Run the file directly with Node.js:
+
+```bash
+node test-db.js
+```
+
+> [!TIP]
+> After running the test script, launch **Prisma Studio** with `pnpm studio` to visually inspect the newly created book and author records in your browser.
 
 ---
 
